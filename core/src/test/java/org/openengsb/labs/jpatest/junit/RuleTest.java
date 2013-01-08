@@ -21,7 +21,7 @@ public class RuleTest {
     public void testApp() {
         TestModel testModel = new TestModel();
         testModel.setValue("TEST");
-        EntityManager em = persistenceXml.getEntityManagerFactory("jpa-unit-test");
+        EntityManager em = persistenceXml.getEntityManager("jpa-unit-test");
         em.getTransaction().begin();
         em.persist(testModel);
         em.getTransaction().commit();

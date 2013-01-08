@@ -4,24 +4,22 @@ import org.junit.rules.MethodRule;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.Statement;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
-import javax.persistence.PersistenceUnit;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
+import javax.persistence.*;
+import javax.persistence.metamodel.ManagedType;
+import javax.persistence.metamodel.Metamodel;
+import java.util.*;
 
 public class TestPersistenceUnit implements MethodRule {
 
 
     private static Map<String,EntityManagerFactory> emCache = new HashMap<String, EntityManagerFactory>();
 
+    private Set<EntityManagerFactory> usedPersistenceUnits = new HashSet<EntityManagerFactory>();
+
     public TestPersistenceUnit() {
     }
 
-    private EntityManager makeEntityManager(String s){
-        EntityManagerFactory emf = makeEntityManagerFactory(s);
+    private EntityManager makeEntityManager(EntityManagerFactory emf){;
         Properties emProperties = new Properties();
         emProperties.put("openjpa.TransactionMode", "local");
         emProperties.put("openjpa.ConnectionFactoryMode", "local");
@@ -41,11 +39,17 @@ public class TestPersistenceUnit implements MethodRule {
         return Persistence.createEntityManagerFactory(s, props);
     }
 
-    public EntityManager getEntityManagerFactory(String s) {
+    public EntityManager getEntityManager(String s) {
+        EntityManagerFactory entityManagerFactory = getEntityManagerFactory(s);
+        usedPersistenceUnits.add(entityManagerFactory);
+        return makeEntityManager(entityManagerFactory);
+    }
+
+    private EntityManagerFactory getEntityManagerFactory(String s) {
         if(!emCache.containsKey(s)){
             emCache.put(s, makeEntityManagerFactory(s));
         }
-        return makeEntityManager(s);
+        return emCache.get(s);
     }
 
     private class PersistenceStatement extends Statement {
@@ -58,12 +62,29 @@ public class TestPersistenceUnit implements MethodRule {
 
         @Override
         public void evaluate() throws Throwable {
+            usedPersistenceUnits.clear();
             parent.evaluate();
+            System.out.println("clearing");
+            for (EntityManagerFactory emf : usedPersistenceUnits) {
+                clearTables(emf);
+            }
+        }
+
+        private void clearTables(EntityManagerFactory emf) {
+            Set<ManagedType<?>> types = emf.getMetamodel().getManagedTypes();
+            for(ManagedType<?> type : types){
+                Class<?> javaType = type.getJavaType();
+                EntityManager entityManager = makeEntityManager(emf);
+                entityManager.getTransaction().begin();
+                Query query = entityManager.createQuery("DELETE FROM " + javaType.getSimpleName());
+                query.executeUpdate();
+                entityManager.getTransaction().commit();
+            }
         }
     }
 
     @Override
     public Statement apply(Statement statement, FrameworkMethod frameworkMethod, Object o) {
-        return statement;
+        return new PersistenceStatement(statement);
     }
 }
