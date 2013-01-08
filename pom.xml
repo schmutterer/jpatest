@@ -42,6 +42,25 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.0</version>
       </plugin>
+      <plugin>
+        <groupId>com.mycila.maven-license-plugin</groupId>
+        <artifactId>maven-license-plugin</artifactId>
+        <version>1.10.b1</version>
+        <configuration>
+          <header>https://raw.github.com/openengsb/openengsb-root/master/etc/license/header.txt</header>
+          <failIfMissing>true</failIfMissing>
+          <aggregate>true</aggregate>
+          <strictCheck>true</strictCheck>
+          <useDefaultExcludes>true</useDefaultExcludes>
+          <excludes>
+            <exclude>atlassian-ide-plugin.xml</exclude>
+            <exclude>**/.idea/**</exclude>
+          </excludes>
+          <mapping>
+            <gitignore>SCRIPT_STYLE</gitignore>
+          </mapping>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
 
