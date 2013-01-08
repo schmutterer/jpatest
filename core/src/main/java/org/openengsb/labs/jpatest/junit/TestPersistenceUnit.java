@@ -75,9 +75,19 @@ public class TestPersistenceUnit implements MethodRule {
                 Class<?> javaType = type.getJavaType();
                 EntityManager entityManager = makeEntityManager(emf);
                 entityManager.getTransaction().begin();
-                Query query = entityManager.createQuery("DELETE FROM " + javaType.getSimpleName());
+                Query query = entityManager.createQuery("DELETE FROM " + retrieveEntityName(javaType));
                 query.executeUpdate();
                 entityManager.getTransaction().commit();
+            }
+        }
+
+        private String retrieveEntityName(Class<?> javaType) {
+            String entityName;
+            Entity entity = javaType.getAnnotation(Entity.class);
+            if(entity.name().isEmpty()){
+                return javaType.getSimpleName();
+            } else {
+                return entity.name();
             }
         }
     }

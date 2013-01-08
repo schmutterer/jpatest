@@ -27,7 +27,7 @@ public class BundleTest {
     @AfterClass
     public static void tearDownClass() throws Exception {
         EntityManager em = new TestPersistenceUnit().getEntityManager("jpa-test2");
-        Query query = em.createQuery("SELECT t FROM Test2Model t");
+        Query query = em.createQuery("SELECT t FROM TEST2 t");
         assertThat(query.getResultList().size(), is(0));
     }
     @Test
@@ -40,7 +40,7 @@ public class BundleTest {
         em.getTransaction().commit();
         Test2Model queriedModel = em.find(Test2Model.class, testModel.getId());
         assertThat(queriedModel.getValue(), is("TEST"));
-        Query query = em.createQuery("SELECT t FROM Test2Model t");
+        Query query = em.createQuery("SELECT t FROM TEST2 t");
         assertThat(query.getResultList().size(), is(1));
     }
 
