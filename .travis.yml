@@ -8,8 +8,8 @@ notifications:
 
 env:
     global:
-        - SONATYPE_USERNAME=christophg
-        - secure: "CjpplmEvL+8SbTdIdaaWHM/6bRih927MPt8Ey0WF2RBbL9JKp0Gwq71Vb9q4\nT84D5UYVhqmUsFyB55dGfJ3hk5vurJxoEg7WtfS7VSkxmUQZ6+FkKTZJCjxk\n0RSdxkuqN0OYmdE8LL0ZMF4Oi7VocJVsVbt+teg8sRyTFQJb/A8="
+        - SONATYPE_USERNAME=pieber
+        - secure: "WJVaSnmvlqRj7/13alNoh8usSpGR5Q50d77A+olqLCfPxaulnKaO8K+deIMp\n6bHhAIJB724hqhZ3bJMmYrSt1WrWgq9hBxeF2fkz9Mo9PDYpP6i40TF4xXMQ\nLHLHTgf0mzBABpotCfwRssPWtmnKO4z0SrYEzPaU5mtD1rLE1aU="
 
 after_success:
   - wget https://raw.github.com/openengsb/openengsb-root/master/etc/travis/addServer.py
