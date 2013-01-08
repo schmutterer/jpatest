@@ -64,7 +64,6 @@ public class TestPersistenceUnit implements MethodRule {
         public void evaluate() throws Throwable {
             usedPersistenceUnits.clear();
             parent.evaluate();
-            System.out.println("clearing");
             for (EntityManagerFactory emf : usedPersistenceUnits) {
                 clearTables(emf);
             }
