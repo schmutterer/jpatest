@@ -23,7 +23,6 @@ import javax.persistence.EntityManager;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Unit test for simple App.

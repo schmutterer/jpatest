@@ -22,20 +22,20 @@ import org.junit.runners.model.Statement;
 
 import javax.persistence.*;
 import javax.persistence.metamodel.ManagedType;
-import javax.persistence.metamodel.Metamodel;
 import java.util.*;
 
 public class TestPersistenceUnit implements MethodRule {
 
 
-    private static Map<String,EntityManagerFactory> emCache = new HashMap<String, EntityManagerFactory>();
+    private static Map<String, EntityManagerFactory> emCache = new HashMap<String, EntityManagerFactory>();
 
     private Set<EntityManagerFactory> usedPersistenceUnits = new HashSet<EntityManagerFactory>();
 
     public TestPersistenceUnit() {
     }
 
-    private EntityManager makeEntityManager(EntityManagerFactory emf){;
+    private EntityManager makeEntityManager(EntityManagerFactory emf) {
+        ;
         Properties emProperties = new Properties();
         emProperties.put("openjpa.TransactionMode", "local");
         emProperties.put("openjpa.ConnectionFactoryMode", "local");
@@ -62,7 +62,7 @@ public class TestPersistenceUnit implements MethodRule {
     }
 
     private EntityManagerFactory getEntityManagerFactory(String s) {
-        if(!emCache.containsKey(s)){
+        if (!emCache.containsKey(s)) {
             emCache.put(s, makeEntityManagerFactory(s));
         }
         return emCache.get(s);
@@ -87,7 +87,7 @@ public class TestPersistenceUnit implements MethodRule {
 
         private void clearTables(EntityManagerFactory emf) {
             Set<ManagedType<?>> types = emf.getMetamodel().getManagedTypes();
-            for(ManagedType<?> type : types){
+            for (ManagedType<?> type : types) {
                 Class<?> javaType = type.getJavaType();
                 EntityManager entityManager = makeEntityManager(emf);
                 entityManager.getTransaction().begin();
@@ -100,7 +100,7 @@ public class TestPersistenceUnit implements MethodRule {
         private String retrieveEntityName(Class<?> javaType) {
             String entityName;
             Entity entity = javaType.getAnnotation(Entity.class);
-            if(entity.name().isEmpty()){
+            if (entity.name().isEmpty()) {
                 return javaType.getSimpleName();
             } else {
                 return entity.name();

@@ -20,7 +20,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
-@Entity(name="TEST2")
+@Entity(name = "TEST2")
 public class Test2Model {
 
     @Id
