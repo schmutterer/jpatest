@@ -33,7 +33,7 @@ public class TestPersistenceUnit implements MethodRule {
         props.put("openjpa.Connection2URL", String.format("jdbc:h2:mem:%s;DB_CLOSE_DELAY=-1", s));
         props.put("openjpa.Connection2DriverName", "org.h2.Driver");
         props.put("openjpa.jdbc.SynchronizeMappings",
-                "buildSchema(SchemaAction='add,deleteTableContents',ForeignKeys=true)");
+                "buildSchema(SchemaAction='add')");
         props.put("openjpa.ConnectionRetainMode", "always");
         props.put("openjpa.ConnectionFactoryMode", "local");
         return Persistence.createEntityManagerFactory(s, props);
