@@ -34,14 +34,17 @@ How to use
 ====================
 With maven add this dependency to your pom.xml:
 
+<pre>
 <dependency>
   <groupId>org.openengsb.labs.jpatest</groupId>
   <artifactId>jpa-test-core</artifactId>
   <scope>test</scope>
 </dependency>
+</pre>
 
 To use EntityManagers in your junit-tests include the Rule in your tests like this:
 
+<pre>
 @Rule
 public final TestPersistenceUnit testPersistenceUnit = new TestPersistenceUnit();
 
@@ -50,3 +53,11 @@ public void myTest throws Exception {
   EntityManager em = testPersistenceUnit.getPersistenceUnit("my-persistence-unit")
   // do stuff with our em
 }
+</pre>
+
+Limitations
+====================
+Right now the library will only work testing with OpenJPA and H2Database. While this might sound as a no go
+for your project consider that most of your JPA tests will tackle if your queries are correct JPA provider and
+database independent. So, while this might not be a 100% match it will (in many cases) still provider ways better
+results than going without it.
