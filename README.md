@@ -33,12 +33,12 @@ That's it.
 How to use
 ====================
 With maven add this dependency to your pom.xml:
-&lt;dependency&gt;
 <pre>
 &lt;dependency&gt;
   &lt;groupId&gt;org.openengsb.labs.jpatest&lt;/groupId&gt;
   &lt;artifactId&gt;jpa-test-core&lt;/artifactId&gt;
   &lt;scope&gt;test&lt;/scope&gt;
+  &lt;version&gt;LATEST_JPATEST_VERSION&lt;/version&gt;
 &lt;/dependency&gt;
 </pre>
 
