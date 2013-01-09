@@ -35,7 +35,6 @@ public class TestPersistenceUnit implements MethodRule {
     }
 
     private EntityManager makeEntityManager(EntityManagerFactory emf) {
-        ;
         Properties emProperties = new Properties();
         emProperties.put("openjpa.TransactionMode", "local");
         emProperties.put("openjpa.ConnectionFactoryMode", "local");
@@ -97,13 +96,11 @@ public class TestPersistenceUnit implements MethodRule {
         }
 
         private String retrieveEntityName(Class<?> javaType) {
-            String entityName;
             Entity entity = javaType.getAnnotation(Entity.class);
             if (entity.name().isEmpty()) {
                 return javaType.getSimpleName();
-            } else {
-                return entity.name();
             }
+            return entity.name();
         }
     }
 
