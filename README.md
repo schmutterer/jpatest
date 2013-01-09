@@ -33,13 +33,13 @@ That's it.
 How to use
 ====================
 With maven add this dependency to your pom.xml:
-
+&lt;dependency&gt;
 <pre>
-<dependency>
-  <groupId>org.openengsb.labs.jpatest</groupId>
-  <artifactId>jpa-test-core</artifactId>
-  <scope>test</scope>
-</dependency>
+&lt;dependency&gt;
+  &lt;groupId&gt;org.openengsb.labs.jpatest&lt;/groupId&gt;
+  &lt;artifactId&gt;jpa-test-core&lt;/artifactId&gt;
+  &lt;scope&gt;test&lt;/scope&gt;
+&lt;/dependency&gt;
 </pre>
 
 To use EntityManagers in your junit-tests include the Rule in your tests like this:
