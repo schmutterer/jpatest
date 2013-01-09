@@ -19,6 +19,7 @@ package org.openengsb.labs.jpatest.junit.itest;
 import org.junit.AfterClass;
 import org.junit.Rule;
 import org.junit.Test;
+import org.openengsb.labs.jpatest.example.TestModel;
 import org.openengsb.labs.jpatest.example2.Test2Model;
 import org.openengsb.labs.jpatest.junit.TestPersistenceUnit;
 
@@ -37,14 +38,31 @@ public class BundleTest {
     public TestPersistenceUnit persistenceXml = new TestPersistenceUnit();
 
     @AfterClass
-    public static void tearDownClass() throws Exception {
+    public static void makeSureTablesAreDeleted() throws Exception {
         EntityManager em = new TestPersistenceUnit().getEntityManager("jpa-test2");
         Query query = em.createQuery("SELECT t FROM TEST2 t");
+        assertThat(query.getResultList().size(), is(0));
+        em = new TestPersistenceUnit().getEntityManager("jpa-test");
+        query = em.createQuery("SELECT t FROM TestModel t");
         assertThat(query.getResultList().size(), is(0));
     }
 
     @Test
-    public void testApp() {
+    public void testEntityManagerForPU_shouldWork() {
+        TestModel testModel = new TestModel();
+        testModel.setValue("TEST");
+        EntityManager em = persistenceXml.getEntityManager("jpa-test");
+        em.getTransaction().begin();
+        em.persist(testModel);
+        em.getTransaction().commit();
+        TestModel queriedModel = em.find(TestModel.class, testModel.getId());
+        assertThat(queriedModel.getValue(), is("TEST"));
+        Query query = em.createQuery("SELECT t FROM TestModel t");
+        assertThat(query.getResultList().size(), is(1));
+    }
+
+    @Test
+    public void testPUWithNamedEntity_shouldWork() {
         Test2Model testModel = new Test2Model();
         testModel.setValue("TEST");
         EntityManager em = persistenceXml.getEntityManager("jpa-test2");

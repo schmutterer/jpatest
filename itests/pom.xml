@@ -24,14 +24,17 @@
     <dependency>
       <groupId>org.openengsb.labs.jpatest</groupId>
       <artifactId>labs-jpatest-core</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.openengsb.labs.jpatest</groupId>
       <artifactId>labs-jpatest-sample1</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.openengsb.labs.jpatest</groupId>
       <artifactId>labs-jpatest-sample2</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
