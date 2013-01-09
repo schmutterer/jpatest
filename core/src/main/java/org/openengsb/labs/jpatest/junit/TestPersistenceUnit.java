@@ -78,7 +78,6 @@ public class TestPersistenceUnit implements MethodRule {
 
         @Override
         public void evaluate() throws Throwable {
-            usedPersistenceUnits.clear();
             parent.evaluate();
             for (EntityManagerFactory emf : usedPersistenceUnits) {
                 clearTables(emf);
