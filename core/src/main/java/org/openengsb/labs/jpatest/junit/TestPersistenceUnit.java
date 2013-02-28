@@ -30,6 +30,7 @@ public class TestPersistenceUnit implements MethodRule {
     private static Map<String, EntityManagerFactory> emCache = new HashMap<String, EntityManagerFactory>();
 
     private Set<EntityManagerFactory> usedPersistenceUnits = new HashSet<EntityManagerFactory>();
+    private Set<EntityManager> createdEntityManagers = new HashSet<EntityManager>();
 
     public TestPersistenceUnit() {
     }
@@ -56,7 +57,9 @@ public class TestPersistenceUnit implements MethodRule {
     public EntityManager getEntityManager(String s) {
         EntityManagerFactory entityManagerFactory = getEntityManagerFactory(s);
         usedPersistenceUnits.add(entityManagerFactory);
-        return makeEntityManager(entityManagerFactory);
+        EntityManager entityManager = makeEntityManager(entityManagerFactory);
+        createdEntityManagers.add(entityManager);
+        return entityManager;
     }
 
     private EntityManagerFactory getEntityManagerFactory(String s) {
@@ -77,6 +80,14 @@ public class TestPersistenceUnit implements MethodRule {
         @Override
         public void evaluate() throws Throwable {
             parent.evaluate();
+            for (EntityManager e : createdEntityManagers) {
+                if(e.getTransaction().isActive()) {
+                    e.getTransaction().rollback();
+                    throw new AssertionError("EntityManager " + e + " left an open transaction");
+                }
+                e.close();
+            }
+            createdEntityManagers.clear();
             for (EntityManagerFactory emf : usedPersistenceUnits) {
                 clearTables(emf);
             }
