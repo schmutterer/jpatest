@@ -37,7 +37,6 @@ public class TestPersistenceUnit implements MethodRule {
     private EntityManager makeEntityManager(EntityManagerFactory emf) {
         Properties emProperties = new Properties();
         emProperties.put("openjpa.TransactionMode", "local");
-        emProperties.put("openjpa.ConnectionFactoryMode", "local");
         return emf.createEntityManager(emProperties);
     }
 
