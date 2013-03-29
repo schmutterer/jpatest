@@ -36,8 +36,6 @@
 
   <modules>
     <module>core</module>
-    <module>testsamples/sample1</module>
-    <module>testsamples/sample2</module>
     <module>itests</module>
   </modules>
 
