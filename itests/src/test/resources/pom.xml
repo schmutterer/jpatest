@@ -24,8 +24,8 @@
   </properties>
 
   <modules>
-    <module>multiproject</module>
-    <module>sample-project</module>
+    <module>good/multiproject</module>
+    <module>good/sample-project</module>
   </modules>
 
   <licenses>
