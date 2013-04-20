@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package projects.good.sample;
+package org.openengsb.labs.jpatest.sample1;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;

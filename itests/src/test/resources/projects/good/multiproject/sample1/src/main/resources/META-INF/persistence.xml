@@ -22,7 +22,7 @@
              xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://www.oracle.com/webfolder/technetwork/jsc/xml/ns/persistence/persistence_2_0.xsd">
   <persistence-unit name="jpa-test">
     <provider>org.apache.openjpa.persistence.PersistenceProviderImpl</provider>
-    <class>org.openengsb.labs.jpatest.example.TestModel</class>
+    <class>org.openengsb.labs.jpatest.sample1.TestModel</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <validation-mode>NONE</validation-mode>
     <properties>

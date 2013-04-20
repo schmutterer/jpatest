@@ -26,6 +26,7 @@
   <modules>
     <module>good/multiproject</module>
     <module>good/sample-project</module>
+    <module>good/remote-project</module>
   </modules>
 
   <licenses>
