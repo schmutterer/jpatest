@@ -31,12 +31,12 @@ public class UseInMavenProjectsTest {
 
     @Test
     public void testMultiProject() throws Exception {
-        assertThat(executeMavenBuild("good/multiproject/pom.xml"), is(0L));
+        assertThat(executeMavenBuild("projects/good/multiproject/pom.xml"), is(0L));
     }
 
     @Test
     public void testSimple() throws Exception {
-        assertThat(executeMavenBuild("good/sample-project/pom.xml"), is(0L));
+        assertThat(executeMavenBuild("projects/good/sample-project/pom.xml"), is(0L));
     }
 
     public long executeMavenBuild(String name) throws IOException, InterruptedException, ExecutionException {

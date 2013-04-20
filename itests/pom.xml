@@ -7,7 +7,6 @@
     <version>0.2.0-SNAPSHOT</version>
   </parent>
 
-  <groupId>org.openengsb.labs.jpatest</groupId>
   <artifactId>labs-jpatest-itests</artifactId>
   <version>0.2.0-SNAPSHOT</version>
   <packaging>jar</packaging>
@@ -20,14 +19,23 @@
   </properties>
 
   <build>
+    <testResources>
+      <testResource>
+        <directory>src/test/resources</directory>
+        <excludes>
+          <exclude>**/target/</exclude>
+        </excludes>
+      </testResource>
+    </testResources>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <configuration>
-          <excludes>
-            <exclude>src/test/resources/**/*.java</exclude>
-          </excludes>
+          <testExcludes>
+            <testExclude>src/test/resources/**/*.java</testExclude>
+            <testExclude>${project.build.testOutputDirectory}/**/*.java</testExclude>
+          </testExcludes>
         </configuration>
       </plugin>
     </plugins>
@@ -37,16 +45,6 @@
     <dependency>
       <groupId>org.openengsb.labs.jpatest</groupId>
       <artifactId>labs-jpatest-core</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.openengsb.labs.jpatest</groupId>
-      <artifactId>labs-jpatest-sample1</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.openengsb.labs.jpatest</groupId>
-      <artifactId>labs-jpatest-sample2</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
