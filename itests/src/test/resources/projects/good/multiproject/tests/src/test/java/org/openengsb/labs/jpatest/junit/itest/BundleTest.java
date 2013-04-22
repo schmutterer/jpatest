@@ -48,7 +48,7 @@ public class BundleTest {
     }
 
     @Test
-    public void testEntityManagerForPU_shouldWork() {
+    public void testEntityManagerForPU_shouldWork() throws Exception {
         TestModel testModel = new TestModel();
         testModel.setValue("TEST");
         EntityManager em = persistenceXml.getEntityManager("jpa-test");
@@ -62,7 +62,7 @@ public class BundleTest {
     }
 
     @Test
-    public void testPUWithNamedEntity_shouldWork() {
+    public void testPUWithNamedEntity_shouldWork() throws Exception {
         Test2Model testModel = new Test2Model();
         testModel.setValue("TEST");
         EntityManager em = persistenceXml.getEntityManager("jpa-test2");

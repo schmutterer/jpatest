@@ -14,33 +14,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.openengsb.labs.jpatest.junit;
+package org.openengsb.labs.jpatest.remote;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.openengsb.labs.jpatest.junit.TestPersistenceUnit;
 
 import javax.persistence.EntityManager;
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
 
 /**
  * Unit test for simple App.
  */
-public class RuleTest {
+public class RemoteTest {
 
     @Rule
-    public TestPersistenceUnit persistenceXml = new TestPersistenceUnit();
+    public TestPersistenceUnit persistenceXml = new TestPersistenceUnit(TestPersistenceUnit.readPortFromStream(
+            ClassLoader.getSystemResourceAsStream("ports.properties"),
+            "h2.tcp.port"
+    ));
 
     @Test
     public void testApp() throws Exception {
         TestModel testModel = new TestModel();
         testModel.setValue("TEST");
-        EntityManager em = persistenceXml.getEntityManager("jpa-unit-test");
+        EntityManager em = persistenceXml.getEntityManager("remote");
         em.getTransaction().begin();
         em.persist(testModel);
         em.getTransaction().commit();
-        TestModel queriedModel = em.find(TestModel.class, testModel.getId());
-        assertThat(queriedModel.getValue(), is("TEST"));
+        System.out.println("ACCEPTING CONNECTION");
+        Thread.sleep(10000);
     }
 }

@@ -14,33 +14,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.openengsb.labs.jpatest.junit;
+package org.openengsb.labs.jpatest.remote;
 
-import org.junit.Rule;
-import org.junit.Test;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 
-import javax.persistence.EntityManager;
+@Entity
+public class TestModel {
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+    @Id
+    @GeneratedValue
+    private Long id;
 
-/**
- * Unit test for simple App.
- */
-public class RuleTest {
+    private String value;
 
-    @Rule
-    public TestPersistenceUnit persistenceXml = new TestPersistenceUnit();
+    public Long getId() {
+        return id;
+    }
 
-    @Test
-    public void testApp() throws Exception {
-        TestModel testModel = new TestModel();
-        testModel.setValue("TEST");
-        EntityManager em = persistenceXml.getEntityManager("jpa-unit-test");
-        em.getTransaction().begin();
-        em.persist(testModel);
-        em.getTransaction().commit();
-        TestModel queriedModel = em.find(TestModel.class, testModel.getId());
-        assertThat(queriedModel.getValue(), is("TEST"));
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
     }
 }
