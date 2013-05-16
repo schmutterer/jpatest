@@ -39,6 +39,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
@@ -96,7 +98,9 @@ public class UseInMavenProjectsTest {
                 mvnExecutable = new File(m2Home, "bin/" + mvnExecutable).getAbsolutePath();
             }
             URL good = ClassLoader.getSystemResource(name);
-            ProcessBuilder processBuilder = new ProcessBuilder(mvnExecutable, "-f", good.getFile(), "install");
+            String property = System.getProperty("labs.jpa.version");
+            assertThat(property, not(nullValue()));
+            ProcessBuilder processBuilder = new ProcessBuilder(mvnExecutable, "-f", good.getFile(), "install", "-Dlabs.jpa.version=" + property);
             processBuilder.redirectErrorStream(true);
             process = processBuilder.start();
             outputTask = new FutureTask<Void>(new Callable<Void>() {

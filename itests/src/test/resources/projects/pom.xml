@@ -20,7 +20,8 @@
     <geronimo-jpa_2.0_spec.version>1.1</geronimo-jpa_2.0_spec.version>
     <openjpa.version>2.2.1</openjpa.version>
     <slf4j.version>1.7.2</slf4j.version>
-    <labs.jpatest.version>0.2.0-SNAPSHOT</labs.jpatest.version>
+    <!-- labs.jpatest.version overriden during outer maven-build -->
+    <labs.jpatest.version>0.3.0-SNAPSHOT</labs.jpatest.version>
   </properties>
 
   <modules>
@@ -78,18 +79,18 @@
         </plugin>
       </plugins>
     </pluginManagement>
-  <plugins>
-    <plugin>
-      <groupId>org.apache.maven.plugins</groupId>
-      <artifactId>maven-compiler-plugin</artifactId>
-      <version>${maven-compiler-plugin.version}</version>
-      <configuration>
-        <source>1.6</source>
-        <target>1.6</target>
-      </configuration>
-    </plugin>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>${maven-compiler-plugin.version}</version>
+        <configuration>
+          <source>1.6</source>
+          <target>1.6</target>
+        </configuration>
+      </plugin>
 
-  </plugins>
+    </plugins>
   </build>
 
   <dependencies>
