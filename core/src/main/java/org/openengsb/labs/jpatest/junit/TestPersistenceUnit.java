@@ -20,6 +20,8 @@ import org.h2.tools.Server;
 import org.junit.rules.MethodRule;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.Statement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.persistence.Entity;
 import javax.persistence.EntityManager;
@@ -37,6 +39,8 @@ import java.util.Properties;
 import java.util.Set;
 
 public class TestPersistenceUnit implements MethodRule {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(TestPersistenceUnit.class);
 
     private static Map<String, EntityManagerFactory> emCache = new HashMap<String, EntityManagerFactory>();
 
@@ -109,34 +113,43 @@ public class TestPersistenceUnit implements MethodRule {
 
         @Override
         public void evaluate() throws Throwable {
-            parent.evaluate();
-            for (EntityManager e : createdEntityManagers) {
-                if (e.getTransaction().isActive()) {
-                    e.getTransaction().rollback();
-                    throw new AssertionError("EntityManager " + e + " left an open transaction");
+            try {
+                parent.evaluate();
+                for (EntityManager e : createdEntityManagers) {
+                    if (e.getTransaction().isActive()) {
+                        e.getTransaction().rollback();
+                        throw new AssertionError("EntityManager " + e + " left an open transaction");
+                    }
                 }
-                e.close();
-            }
-            createdEntityManagers.clear();
-            for (EntityManagerFactory emf : usedPersistenceUnits) {
-                clearTables(emf);
+            } finally {
+                try {
+                    for (EntityManager e : createdEntityManagers) {
+                        e.close();
+                    }
+                } finally {
+                    createdEntityManagers.clear();
+                    for (EntityManagerFactory emf : usedPersistenceUnits) {
+                        clearTables(emf);
+                    }
+                }
             }
         }
 
         private void clearTables(EntityManagerFactory emf) {
             Set<ManagedType<?>> types = emf.getMetamodel().getManagedTypes();
+            EntityManager entityManager = makeEntityManager(emf);
             for (ManagedType<?> type : types) {
                 Class<?> javaType = type.getJavaType();
-                EntityManager entityManager = makeEntityManager(emf);
-                entityManager.getTransaction().begin();
                 String name = retrieveEntityName(javaType);
                 if (name == null) {
+                    LOGGER.warn("could not determine name for entity {}", type);
                     continue;
                 }
-                Query query = entityManager.createQuery("DELETE FROM " + name);
-                query.executeUpdate();
+                entityManager.getTransaction().begin();
+                entityManager.createQuery("DELETE FROM " + name).executeUpdate();
                 entityManager.getTransaction().commit();
             }
+            entityManager.close();
         }
 
         private String retrieveEntityName(Class<?> javaType) {
@@ -159,8 +172,13 @@ public class TestPersistenceUnit implements MethodRule {
         @Override
         public void evaluate() throws Throwable {
             tcpServer.start();
-            super.evaluate();
-            tcpServer.stop();
+            LOGGER.info("TCP server started");
+            try {
+                super.evaluate();
+            } finally {
+                LOGGER.info("TCP server stopped");
+                tcpServer.stop();
+            }
         }
     }
 
