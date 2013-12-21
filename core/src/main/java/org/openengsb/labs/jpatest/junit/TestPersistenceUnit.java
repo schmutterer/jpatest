@@ -77,14 +77,18 @@ public class TestPersistenceUnit implements MethodRule {
 
     private EntityManagerFactory makeEntityManagerFactory(String s) throws SQLException {
         Properties props = new Properties();
-        props.put("openjpa.ConnectionURL", String.format("jdbc:h2:mem:%s;DB_CLOSE_DELAY=-1", s));
-        props.put("openjpa.ConnectionDriverName", "org.h2.Driver");
+        props.put("javax.persistence.jdbc.url", String.format("jdbc:h2:mem:%s;DB_CLOSE_DELAY=-1", s));
+        props.put("javax.persistence.jdbc.driver", "org.h2.Driver");
         props.put("openjpa.Connection2URL", String.format("jdbc:h2:mem:%s;DB_CLOSE_DELAY=-1", s));
         props.put("openjpa.Connection2DriverName", "org.h2.Driver");
         props.put("openjpa.jdbc.SynchronizeMappings",
                 "buildSchema(SchemaAction='add')");
         props.put("openjpa.ConnectionRetainMode", "always");
         props.put("openjpa.ConnectionFactoryMode", "local");
+        // support eclipse-link
+        props.put("javax.persistence.transactionType", "RESOURCE_LOCAL");
+        props.put("eclipselink.ddl-generation", "create-tables");
+        props.put("eclipselink.ddl-generation.output-mode", "database");
         return Persistence.createEntityManagerFactory(s, props);
     }
 
