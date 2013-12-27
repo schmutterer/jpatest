@@ -16,27 +16,32 @@
  */
 package org.openengsb.labs.jpatest.junit;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.SQLException;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+import javax.persistence.Entity;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+import javax.persistence.PersistenceException;
+import javax.persistence.metamodel.ManagedType;
+import javax.persistence.metamodel.SingularAttribute;
+
 import org.h2.tools.Server;
 import org.junit.rules.MethodRule;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.Statement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.persistence.Entity;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
-import javax.persistence.Query;
-import javax.persistence.metamodel.ManagedType;
-import java.io.IOException;
-import java.io.InputStream;
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
 
 public class TestPersistenceUnit implements MethodRule {
 
@@ -139,21 +144,41 @@ public class TestPersistenceUnit implements MethodRule {
             }
         }
 
-        private void clearTables(EntityManagerFactory emf) {
+        private void clearTables(EntityManagerFactory emf) throws SQLException {
+            long start = System.currentTimeMillis();
             Set<ManagedType<?>> types = emf.getMetamodel().getManagedTypes();
             EntityManager entityManager = makeEntityManager(emf);
+            Set<Class<?>> javaTypes = new HashSet<Class<?>>();
             for (ManagedType<?> type : types) {
-                Class<?> javaType = type.getJavaType();
-                String name = retrieveEntityName(javaType);
-                if (name == null) {
-                    LOGGER.warn("could not determine name for entity {}", type);
-                    continue;
-                }
-                entityManager.getTransaction().begin();
-                entityManager.createQuery("DELETE FROM " + name).executeUpdate();
-                entityManager.getTransaction().commit();
+                javaTypes.add(type.getJavaType());
             }
-            entityManager.close();
+            int lastsize = javaTypes.size();
+            while (!javaTypes.isEmpty()) {
+                Iterator<Class<?>> iterator = javaTypes.iterator();
+                while (iterator.hasNext()) {
+                    Class<?> javaType = iterator.next();
+                    String name = retrieveEntityName(javaType);
+                    if (name == null) {
+                        LOGGER.warn("could not determine name for entity {}", javaType);
+                        iterator.remove();
+                        continue;
+                    }
+                    try {
+                        entityManager.getTransaction().begin();
+                        entityManager.createQuery("DELETE FROM " + name).executeUpdate();
+                        entityManager.getTransaction().commit();
+                        iterator.remove();
+                    } catch (PersistenceException e) {
+                        LOGGER.debug("",e);
+                        entityManager.getTransaction().rollback();
+                    }
+                }
+                if (javaTypes.size() == lastsize) {
+                    throw new RuntimeException("could not clean tables, maybe cyclic dependency");
+                }
+                lastsize = javaTypes.size();
+            }
+            LOGGER.info("cleared database in {}ms", System.currentTimeMillis() - start);
         }
 
         private String retrieveEntityName(Class<?> javaType) {
