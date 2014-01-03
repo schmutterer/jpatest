@@ -6,10 +6,9 @@
     <groupId>org.openengsb.labs.jpatest.test</groupId>
     <artifactId>test-parent</artifactId>
     <version>1.0.0-SNAPSHOT</version>
-    <relativePath>../..</relativePath>
   </parent>
 
-  <artifactId>labs-jpatest-sample1</artifactId>
+  <artifactId>labs-jpatest-openjpa23</artifactId>
   <packaging>jar</packaging>
 
   <name>labs-jpatest-sample1</name>

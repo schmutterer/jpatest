@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
 import java.io.BufferedReader;
@@ -22,16 +21,12 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.StringBufferInputStream;
-import java.io.StringReader;
 import java.net.URL;
-import java.sql.Array;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.Callable;
@@ -53,7 +48,7 @@ public class UseInMavenProjectsTest {
 
     @Test
     public void testSimple() throws Exception {
-        MavenProcessHandler mavenProcessHandler = new MavenProcessHandler("projects/good/sample-project/pom.xml");
+        MavenProcessHandler mavenProcessHandler = new MavenProcessHandler("projects/good/openjpa23/pom.xml");
         mavenProcessHandler.start();
         mavenProcessHandler.waitForLineInOutput("SUCCESS");
         assertThat(mavenProcessHandler.waitForBuildToFinish(), is(0L));
@@ -67,6 +62,16 @@ public class UseInMavenProjectsTest {
     @Test
     public void testHibernate4_3() throws Exception {
         assertThat(new MavenProcessHandler("projects/good/hibernate43/pom.xml").execute(), is(0L));
+    }
+
+    @Test
+    public void testEclipselink2_4() throws Exception {
+        assertThat(new MavenProcessHandler("projects/good/eclipselink24/pom.xml").execute(), is(0L));
+    }
+
+    @Test
+    public void testEclipselink2_5() throws Exception {
+        assertThat(new MavenProcessHandler("projects/good/eclipselink25/pom.xml").execute(), is(0L));
     }
 
     @Test
