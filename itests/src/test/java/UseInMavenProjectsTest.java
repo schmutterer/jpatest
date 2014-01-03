@@ -60,6 +60,16 @@ public class UseInMavenProjectsTest {
     }
 
     @Test
+    public void testHibernate4_2() throws Exception {
+        assertThat(new MavenProcessHandler("projects/good/hibernate42/pom.xml").execute(), is(0L));
+    }
+
+    @Test
+    public void testHibernate4_3() throws Exception {
+        assertThat(new MavenProcessHandler("projects/good/hibernate43/pom.xml").execute(), is(0L));
+    }
+
+    @Test
     public void testConnectsToDatabaseDuringTest() throws Exception {
         MavenProcessHandler handler = new MavenProcessHandler("projects/good/remote-project/pom.xml");
         handler.start();

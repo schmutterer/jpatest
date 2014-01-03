@@ -19,23 +19,26 @@ package org.openengsb.labs.jpatest.junit;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.persistence.Entity;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.persistence.PersistenceException;
 import javax.persistence.metamodel.ManagedType;
-import javax.persistence.metamodel.SingularAttribute;
 
+import org.h2.jdbcx.JdbcDataSource;
 import org.h2.tools.Server;
 import org.junit.rules.MethodRule;
 import org.junit.runners.model.FrameworkMethod;
@@ -82,18 +85,36 @@ public class TestPersistenceUnit implements MethodRule {
 
     private EntityManagerFactory makeEntityManagerFactory(String s) throws SQLException {
         Properties props = new Properties();
-        props.put("javax.persistence.jdbc.url", String.format("jdbc:h2:mem:%s;DB_CLOSE_DELAY=-1", s));
+        String url = String.format("jdbc:h2:mem:%s;DB_CLOSE_DELAY=-1", s);
+        props.put("javax.persistence.jdbc.url", url);
         props.put("javax.persistence.jdbc.driver", "org.h2.Driver");
-        props.put("openjpa.Connection2URL", String.format("jdbc:h2:mem:%s;DB_CLOSE_DELAY=-1", s));
+        props.put("javax.persistence.transactionType", "RESOURCE_LOCAL");
+
+        // OpenJPA support
+        props.put("openjpa.Connection2URL", url);
         props.put("openjpa.Connection2DriverName", "org.h2.Driver");
         props.put("openjpa.jdbc.SynchronizeMappings",
                 "buildSchema(SchemaAction='add')");
         props.put("openjpa.ConnectionRetainMode", "always");
         props.put("openjpa.ConnectionFactoryMode", "local");
-        // support eclipse-link
-        props.put("javax.persistence.transactionType", "RESOURCE_LOCAL");
+        // eclipse-link support
         props.put("eclipselink.ddl-generation", "create-tables");
         props.put("eclipselink.ddl-generation.output-mode", "database");
+        // Hibernate support
+        props.put("hibernate.hbm2ddl.auto", "create-drop");
+        props.put("hibernate.connection.driver_class", "org.h2.Driver");
+        props.put("hibernate.dialect", "org.hibernate.dialect.H2Dialect");
+        props.put("hibernate.connection.url", url);
+        props.put("hibernate.show_sql", "true");
+        JdbcDataSource dataSource = new JdbcDataSource();
+        dataSource.setURL(url);
+        String dataSourceUrl = "java:/dummyDataSource_" + s;
+        try {
+            new InitialContext().bind(dataSourceUrl, dataSource);
+        } catch (NamingException e) {
+            throw new AssertionError(e);
+        }
+        props.put("hibernate.connection.datasource", dataSourceUrl);
         return Persistence.createEntityManagerFactory(s, props);
     }
 
@@ -122,6 +143,15 @@ public class TestPersistenceUnit implements MethodRule {
 
         @Override
         public void evaluate() throws Throwable {
+            InitialContext initialContext;
+            try {
+                System.setProperty(Context.INITIAL_CONTEXT_FACTORY,  "org.apache.naming.java.javaURLContextFactory");
+                System.setProperty(Context.URL_PKG_PREFIXES, "org.apache.naming");
+                initialContext = new InitialContext(new Hashtable<String, Object>());
+                initialContext.createSubcontext("java:");
+            } catch (NamingException e) {
+                throw new RuntimeException(e);
+            }
             try {
                 parent.evaluate();
                 for (EntityManager e : createdEntityManagers) {
@@ -131,6 +161,8 @@ public class TestPersistenceUnit implements MethodRule {
                     }
                 }
             } finally {
+                initialContext.destroySubcontext("java:");
+                initialContext.close();
                 try {
                     for (EntityManager e : createdEntityManagers) {
                         e.close();
@@ -155,6 +187,7 @@ public class TestPersistenceUnit implements MethodRule {
             int lastsize = javaTypes.size();
             while (!javaTypes.isEmpty()) {
                 Iterator<Class<?>> iterator = javaTypes.iterator();
+                Collection<Exception> exceptionsDuringClean = new ArrayList<Exception>();
                 while (iterator.hasNext()) {
                     Class<?> javaType = iterator.next();
                     String name = retrieveEntityName(javaType);
@@ -168,16 +201,32 @@ public class TestPersistenceUnit implements MethodRule {
                         entityManager.createQuery("DELETE FROM " + name).executeUpdate();
                         entityManager.getTransaction().commit();
                         iterator.remove();
-                    } catch (PersistenceException e) {
-                        LOGGER.debug("",e);
-                        entityManager.getTransaction().rollback();
+                    } catch (Exception e) {
+                        if (e instanceof PersistenceException
+                                || e.getClass().getName().equals("org.eclipse.persistence.exceptions.DatabaseException") // for eclipse-link < 2.5.0
+                                ) {
+                            exceptionsDuringClean.add(e);
+                            LOGGER.debug("error during delete, could be normal", e);
+                            entityManager.getTransaction().rollback();
+                        }
                     }
                 }
                 if (javaTypes.size() == lastsize) {
-                    throw new RuntimeException("could not clean tables, maybe cyclic dependency");
+                    entityManager.getTransaction().begin();
+                    entityManager.createNativeQuery("SHUTDOWN").executeUpdate();
+
+                    try {
+                        entityManager.getTransaction().commit();
+                    } catch (Exception e) {
+                        // will always fail because database is shutting down,
+                        // but we need to clear the transaction-state in the entitymanager
+                        break;
+                    }
+                    LOGGER.error("could not clean database", exceptionsDuringClean.iterator().next());
                 }
                 lastsize = javaTypes.size();
             }
+            entityManager.close();
             LOGGER.info("cleared database in {}ms", System.currentTimeMillis() - start);
         }
 
