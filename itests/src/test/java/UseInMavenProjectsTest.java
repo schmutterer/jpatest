@@ -98,9 +98,9 @@ public class UseInMavenProjectsTest {
                 mvnExecutable = new File(m2Home, "bin/" + mvnExecutable).getAbsolutePath();
             }
             URL good = ClassLoader.getSystemResource(name);
-            String property = System.getProperty("labs.jpa.version");
+            String property = System.getProperty("labs.jpatest.version");
             assertThat(property, not(nullValue()));
-            ProcessBuilder processBuilder = new ProcessBuilder(mvnExecutable, "-f", good.getFile(), "install", "-Dlabs.jpa.version=" + property);
+            ProcessBuilder processBuilder = new ProcessBuilder(mvnExecutable, "-f", good.getFile(), "install", "-Dlabs.jpatest.version=" + property);
             processBuilder.redirectErrorStream(true);
             process = processBuilder.start();
             outputTask = new FutureTask<Void>(new Callable<Void>() {

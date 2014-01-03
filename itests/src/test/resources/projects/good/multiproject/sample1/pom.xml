@@ -22,18 +22,6 @@
       <groupId>org.apache.geronimo.specs</groupId>
       <artifactId>geronimo-jpa_2.0_spec</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.openengsb.labs.jpatest</groupId>
-      <artifactId>labs-jpatest-core</artifactId>
-    </dependency>
   </dependencies>
 
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.openjpa</groupId>
-        <artifactId>openjpa-maven-plugin</artifactId>
-      </plugin>
-    </plugins>
-  </build>
 </project>

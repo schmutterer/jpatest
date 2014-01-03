@@ -20,8 +20,6 @@
     <geronimo-jpa_2.0_spec.version>1.1</geronimo-jpa_2.0_spec.version>
     <openjpa.version>2.2.1</openjpa.version>
     <slf4j.version>1.7.2</slf4j.version>
-    <!-- labs.jpatest.version overriden during outer maven-build -->
-    <labs.jpatest.version>0.3.0-SNAPSHOT</labs.jpatest.version>
   </properties>
 
   <modules>
@@ -37,61 +35,6 @@
       <distribution>repo</distribution>
     </license>
   </licenses>
-
-  <build>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.apache.openjpa</groupId>
-          <artifactId>openjpa-maven-plugin</artifactId>
-          <version>${openjpa.version}</version>
-          <configuration>
-            <includes>**/*.class</includes>
-            <addDefaultConstructor>true</addDefaultConstructor>
-            <enforcePropertyRestrictions>true</enforcePropertyRestrictions>
-          </configuration>
-          <executions>
-            <execution>
-              <id>enhancer</id>
-              <phase>process-classes</phase>
-              <goals>
-                <goal>enhance</goal>
-              </goals>
-            </execution>
-          </executions>
-          <dependencies>
-            <dependency>
-              <groupId>org.apache.openjpa</groupId>
-              <artifactId>openjpa</artifactId>
-              <version>${openjpa.version}</version>
-            </dependency>
-            <dependency>
-              <groupId>org.slf4j</groupId>
-              <artifactId>slf4j-api</artifactId>
-              <version>${slf4j.version}</version>
-            </dependency>
-            <dependency>
-              <groupId>org.slf4j</groupId>
-              <artifactId>slf4j-simple</artifactId>
-              <version>${slf4j.version}</version>
-            </dependency>
-          </dependencies>
-        </plugin>
-      </plugins>
-    </pluginManagement>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>${maven-compiler-plugin.version}</version>
-        <configuration>
-          <source>1.6</source>
-          <target>1.6</target>
-        </configuration>
-      </plugin>
-
-    </plugins>
-  </build>
 
   <dependencies>
     <dependency>
@@ -116,11 +59,6 @@
         <groupId>org.apache.geronimo.specs</groupId>
         <artifactId>geronimo-jpa_2.0_spec</artifactId>
         <version>${geronimo-jpa_2.0_spec.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.openjpa</groupId>
-        <artifactId>openjpa</artifactId>
-        <version>${openjpa.version}</version>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
