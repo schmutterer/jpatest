@@ -48,33 +48,82 @@ import org.slf4j.LoggerFactory;
 
 public class TestPersistenceUnit implements MethodRule {
 
+    public static final String JPATEST_SERVER_PORT = "h2.tcp.port";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(TestPersistenceUnit.class);
+    private static final Properties GLOBAL_DEFAULTS = new Properties(){{
+        put("javax.persistence.transactionType", "RESOURCE_LOCAL");
+        // EclipseLink
+        put("javax.persistence.jdbc.driver", "org.h2.Driver");
+        put("eclipselink.ddl-generation", "create-tables");
+        put("eclipselink.ddl-generation.output-mode", "database");
+        // OpenJPA
+        put("openjpa.Connection2DriverName", "org.h2.Driver");
+        put("openjpa.jdbc.SynchronizeMappings", "buildSchema(SchemaAction='add')");
+        put("openjpa.ConnectionRetainMode", "always");
+        put("openjpa.ConnectionFactoryMode", "local");
+        // Hibernate
+        put("hibernate.connection.driver_class", "org.h2.Driver");
+        put("hibernate.hbm2ddl.auto", "create-drop");
+        put("hibernate.dialect", "org.hibernate.dialect.H2Dialect");
+    }};
 
     private static Map<String, EntityManagerFactory> emCache = new HashMap<String, EntityManagerFactory>();
-
     private Set<EntityManagerFactory> usedPersistenceUnits = new HashSet<EntityManagerFactory>();
     private Set<EntityManager> createdEntityManagers = new HashSet<EntityManager>();
     private Server tcpServer;
+    private Properties propertyOverrides;
 
     public TestPersistenceUnit() {
+        init(new Properties());
     }
 
     public TestPersistenceUnit(int port) {
-        try {
-            tcpServer = Server.createTcpServer("-tcpPort", "" + port);
-        } catch (SQLException e) {
-            throw new IllegalStateException(e);
-        }
+        Properties properties = new Properties();
+        properties.put(JPATEST_SERVER_PORT, port);
+        init(properties);
     }
 
-    public static int readPortFromStream(InputStream stream, String property) {
+    public TestPersistenceUnit(String... propertyFiles) {
         Properties properties = new Properties();
-        try {
-            properties.load(stream);
-        } catch (IOException e) {
-            throw new IllegalStateException(e);
+        for (String propertyFile : propertyFiles) {
+            try {
+                properties.load(ClassLoader.getSystemResourceAsStream(propertyFile));
+            } catch (IOException e) {
+                LOGGER.warn("unable to read propertyfile" + propertyFile, e);
+            }
         }
-        return Integer.parseInt((String) properties.get(property));
+        init(properties);
+    }
+
+    public TestPersistenceUnit(InputStream... propertyStreams) {
+        Properties properties = new Properties();
+        for (InputStream propertyStream : propertyStreams) {
+            try {
+                properties.load(propertyStream);
+            } catch (IOException e) {
+                LOGGER.warn("unable to read propertyfile" + propertyStream, e);
+            }
+        }
+        init(properties);
+    }
+
+    public TestPersistenceUnit(Map<?,?> propertyMap) {
+        Properties properties = new Properties();
+        properties.putAll(propertyMap);
+        init(properties);
+    }
+
+    private void init(Properties properties) {
+        if (properties.containsKey(JPATEST_SERVER_PORT)) {
+            String port = (String) properties.get(JPATEST_SERVER_PORT);
+            try {
+                tcpServer = Server.createTcpServer("-tcpPort", port);
+            } catch (SQLException e) {
+                throw new AssertionError(e);
+            }
+        }
+        this.propertyOverrides = properties;
     }
 
     private EntityManager makeEntityManager(EntityManagerFactory emf) {
@@ -84,28 +133,15 @@ public class TestPersistenceUnit implements MethodRule {
     }
 
     private EntityManagerFactory makeEntityManagerFactory(String s) throws SQLException {
-        Properties props = new Properties();
+        Properties persistenceUnitProperties = new Properties();
+        persistenceUnitProperties.putAll(GLOBAL_DEFAULTS);
         String url = String.format("jdbc:h2:mem:%s;DB_CLOSE_DELAY=-1", s);
-        props.put("javax.persistence.jdbc.url", url);
-        props.put("javax.persistence.jdbc.driver", "org.h2.Driver");
-        props.put("javax.persistence.transactionType", "RESOURCE_LOCAL");
-
-        // OpenJPA support
-        props.put("openjpa.Connection2URL", url);
-        props.put("openjpa.Connection2DriverName", "org.h2.Driver");
-        props.put("openjpa.jdbc.SynchronizeMappings",
-                "buildSchema(SchemaAction='add')");
-        props.put("openjpa.ConnectionRetainMode", "always");
-        props.put("openjpa.ConnectionFactoryMode", "local");
-        // eclipse-link support
-        props.put("eclipselink.ddl-generation", "create-tables");
-        props.put("eclipselink.ddl-generation.output-mode", "database");
-        // Hibernate support
-        props.put("hibernate.hbm2ddl.auto", "create-drop");
-        props.put("hibernate.connection.driver_class", "org.h2.Driver");
-        props.put("hibernate.dialect", "org.hibernate.dialect.H2Dialect");
-        props.put("hibernate.connection.url", url);
-        props.put("hibernate.show_sql", "true");
+        // EclipseLink
+        persistenceUnitProperties.put("javax.persistence.jdbc.url", url);
+        // OpenJPA
+        persistenceUnitProperties.put("openjpa.Connection2URL", url);
+        // Hibernate
+        persistenceUnitProperties.put("hibernate.connection.url", url);
         JdbcDataSource dataSource = new JdbcDataSource();
         dataSource.setURL(url);
         String dataSourceUrl = "java:/dummyDataSource_" + s;
@@ -114,8 +150,9 @@ public class TestPersistenceUnit implements MethodRule {
         } catch (NamingException e) {
             throw new AssertionError(e);
         }
-        props.put("hibernate.connection.datasource", dataSourceUrl);
-        return Persistence.createEntityManagerFactory(s, props);
+        persistenceUnitProperties.put("hibernate.connection.datasource", dataSourceUrl);
+        persistenceUnitProperties.putAll(propertyOverrides);
+        return Persistence.createEntityManagerFactory(s, persistenceUnitProperties);
     }
 
     public EntityManager getEntityManager(String s) throws SQLException {
@@ -145,7 +182,7 @@ public class TestPersistenceUnit implements MethodRule {
         public void evaluate() throws Throwable {
             InitialContext initialContext;
             try {
-                System.setProperty(Context.INITIAL_CONTEXT_FACTORY,  "org.apache.naming.java.javaURLContextFactory");
+                System.setProperty(Context.INITIAL_CONTEXT_FACTORY, "org.apache.naming.java.javaURLContextFactory");
                 System.setProperty(Context.URL_PKG_PREFIXES, "org.apache.naming");
                 initialContext = new InitialContext(new Hashtable<String, Object>());
                 initialContext.createSubcontext("java:");

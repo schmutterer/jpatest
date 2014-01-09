@@ -31,10 +31,7 @@ import java.util.Properties;
 public class RemoteTest {
 
     @Rule
-    public TestPersistenceUnit persistenceXml = new TestPersistenceUnit(TestPersistenceUnit.readPortFromStream(
-            ClassLoader.getSystemResourceAsStream("ports.properties"),
-            "h2.tcp.port"
-    ));
+    public TestPersistenceUnit persistenceXml = new TestPersistenceUnit("ports.properties");
 
     @Test
     public void testApp() throws Exception {

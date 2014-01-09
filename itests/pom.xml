@@ -8,7 +8,6 @@
   </parent>
 
   <artifactId>labs-jpatest-itests</artifactId>
-  <version>0.4.0-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>labs-jpatest-itests</name>
