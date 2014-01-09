@@ -16,12 +16,12 @@
  */
 package org.openengsb.labs.jpatest.junit.itest;
 
+import at.schmutterer.oss.jpatest.junit.TestPersistenceUnit;
 import org.junit.AfterClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.openengsb.labs.jpatest.sample1.TestModel;
 import org.openengsb.labs.jpatest.example2.Test2Model;
-import org.openengsb.labs.jpatest.junit.TestPersistenceUnit;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;

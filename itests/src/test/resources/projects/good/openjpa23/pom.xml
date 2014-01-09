@@ -32,7 +32,7 @@
       <version>${openjpa.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.openengsb.labs.jpatest</groupId>
+      <groupId>at.schmutterer.oss.jpatest</groupId>
       <artifactId>labs-jpatest-core</artifactId>
     </dependency>
   </dependencies>
