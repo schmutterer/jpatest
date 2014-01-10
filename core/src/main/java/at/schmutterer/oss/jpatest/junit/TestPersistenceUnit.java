@@ -78,12 +78,21 @@ public class TestPersistenceUnit implements MethodRule {
         init(new Properties());
     }
 
+    /**
+     * let the h2-database start a tcp-server on the given port, to connect during tests
+     */
     public TestPersistenceUnit(int port) {
         Properties properties = new Properties();
         properties.put(JPATEST_SERVER_PORT, port);
         init(properties);
     }
 
+    /**
+     * system-resources that contain propertyfiles with additional
+     * property-overrides for all persistence-units
+     *
+     * Files are loaded via ClassLoader#getSystemResourceAsStream
+     */
     public TestPersistenceUnit(String... propertyFiles) {
         Properties properties = new Properties();
         for (String propertyFile : propertyFiles) {
@@ -96,6 +105,10 @@ public class TestPersistenceUnit implements MethodRule {
         init(properties);
     }
 
+    /**
+     * system-resources that contain propertyfiles with additional
+     * property-overrides for all persistence-units
+     */
     public TestPersistenceUnit(InputStream... propertyStreams) {
         Properties properties = new Properties();
         for (InputStream propertyStream : propertyStreams) {
@@ -108,6 +121,10 @@ public class TestPersistenceUnit implements MethodRule {
         init(properties);
     }
 
+    /**
+     * override properties for all persistence-units
+     * @param propertyMap
+     */
     public TestPersistenceUnit(Map<?,?> propertyMap) {
         Properties properties = new Properties();
         properties.putAll(propertyMap);

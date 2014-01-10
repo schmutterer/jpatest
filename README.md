@@ -7,7 +7,7 @@ While there are many other libraries for that purpuse the specific goals of this
 * Fast teardown of test-database (Only records are deleted, dbs are reused)
 * **Out-of-the-box memory-db** config that is **easy to use**
 
-[![Build Status](https://travis-ci.org/openengsb-labs/labs-jpatest.png?branch=master)](https://travis-ci.org/openengsb-labs/labs-jpatest)
+[![Build Status](https://travis-ci.org/schmutterer/labs-jpatest.png?branch=master)](https://travis-ci.org/openengsb-labs/labs-jpatest)
 
 How to build
 ====================
@@ -38,7 +38,7 @@ With maven add this dependency to your pom.xml:
   &lt;groupId&gt;org.openengsb.labs.jpatest&lt;/groupId&gt;
   &lt;artifactId&gt;jpa-test-core&lt;/artifactId&gt;
   &lt;scope&gt;test&lt;/scope&gt;
-  &lt;version&gt;LATEST_JPATEST_VERSION&lt;/version&gt;
+  &lt;version&gt;LATEST&lt;/version&gt;
 &lt;/dependency&gt;
 </pre>
 
@@ -55,9 +55,6 @@ public void myTest throws Exception {
 }
 </pre>
 
-Limitations
-====================
-Right now the library will only work testing with OpenJPA and H2Database. While this might sound as a no go
-for your project consider that most of your JPA tests will tackle if your queries are correct JPA provider and
-database independent. So, while this might not be a 100% match it will (in many cases) still provider ways better
-results than going without it.
+By default your persistence-units will connect to an in-memory h2-database, that is cleared automatically after each test.
+There's no need for creating a separate persistence.xml just for tests, because the TestPersistenceUnit will override the necessary properties, so that the h2-database with resource-local transaction is used.
+Look at the java-doc for possibilities to override additional properties.
