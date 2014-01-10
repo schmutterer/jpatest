@@ -213,7 +213,7 @@ public class TestPersistenceUnit implements MethodRule {
             }
         }
 
-        private void clearTables(EntityManagerFactory emf) throws SQLException {
+        private void clearTables(EntityManagerFactory emf) {
             long start = System.currentTimeMillis();
             Set<ManagedType<?>> types = emf.getMetamodel().getManagedTypes();
             EntityManager entityManager = makeEntityManager(emf);
