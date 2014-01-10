@@ -4,7 +4,7 @@
   <parent>
     <groupId>at.schmutterer.oss.jpatest</groupId>
     <artifactId>labs-jpatest-parent</artifactId>
-    <version>0.4.0-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>labs-jpatest-itests</artifactId>
@@ -71,11 +71,6 @@
   </build>
 
   <dependencies>
-    <dependency>
-      <groupId>org.openengsb.labs.jpatest</groupId>
-      <artifactId>labs-jpatest-core</artifactId>
-      <version>${project.version}</version>
-    </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
