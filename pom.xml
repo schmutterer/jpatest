@@ -73,7 +73,7 @@
         <artifactId>maven-license-plugin</artifactId>
         <version>${maven-license-plugin.version}</version>
         <configuration>
-          <header>https://raw.github.com/openengsb/openengsb-root/master/etc/license/header.txt</header>
+          <header>etc/license/header.txt</header>
           <failIfMissing>true</failIfMissing>
           <aggregate>true</aggregate>
           <strictCheck>true</strictCheck>
@@ -93,11 +93,11 @@
         <version>${maven-notice-plugin.version}</version>
         <configuration>
           <noticeTemplate>
-            https://raw.github.com/openengsb/openengsb-root/cf0d02085d29fbaa585d21cfe03cb686318d7771/etc/notice/NOTICE.template
+            etc/notice/NOTICE.template
           </noticeTemplate>
           <licenseMapping>
             <param>
-              https://raw.github.com/openengsb/openengsb-root/cf0d02085d29fbaa585d21cfe03cb686318d7771/etc/notice/license-mapping.xml
+              etc/notice/license-mapping.xml
             </param>
           </licenseMapping>
         </configuration>
