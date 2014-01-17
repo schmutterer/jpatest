@@ -24,7 +24,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven-compiler-plugin.version>3.0</maven-compiler-plugin.version>
-    <maven-release-plugin.version>2.2.2</maven-release-plugin.version>
+    <maven-release-plugin.version>2.4.2</maven-release-plugin.version>
     <maven-license-plugin.version>1.10.b1</maven-license-plugin.version>
     <maven-notice-plugin.version>1.0.4</maven-notice-plugin.version>
     <junit.version>4.11</junit.version>
@@ -67,6 +67,14 @@
           <preparationGoals>clean install -Dmaven.test.skip=true</preparationGoals>
           <tagNameFormat>v@{project.version}</tagNameFormat>
         </configuration>
+        <dependencies>
+          <dependency>
+            <groupId>org.apache.maven.scm</groupId>
+            <artifactId>maven-scm-provider-gitexe</artifactId>
+            <!-- This version is necessary for use with git version 1.8.5 -->
+            <version>1.8.1</version>
+          </dependency>
+        </dependencies>
       </plugin>
       <plugin>
         <groupId>com.mycila.maven-license-plugin</groupId>
