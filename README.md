@@ -7,7 +7,7 @@ While there are many other libraries for that purpuse the specific goals of this
 * Fast teardown of test-database (Only records are deleted, dbs are reused)
 * **Out-of-the-box memory-db** config that is **easy to use**
 
-[![Build Status](https://travis-ci.org/schmutterer/labs-jpatest.png?branch=master)](https://travis-ci.org/openengsb-labs/labs-jpatest)
+[![Build Status](https://travis-ci.org/schmutterer/labs-jpatest.png?branch=master)](https://travis-ci.org/schmutterer/labs-jpatest)
 
 How to build
 ====================
