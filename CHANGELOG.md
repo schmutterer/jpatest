@@ -1,3 +1,7 @@
+### 1.1.0
+
+- xxx
+
 ### 1.0.0
 
 - add support for EclipseLink and Hibernate
