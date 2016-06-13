@@ -4,7 +4,7 @@
   <parent>
     <groupId>at.schmutterer.oss.jpatest</groupId>
     <artifactId>labs-jpatest-parent</artifactId>
-    <version>1.1.0</version>
+    <version>1.1.1-SNAPSHOT</version>
   </parent>
 
   <artifactId>labs-jpatest-core</artifactId>
