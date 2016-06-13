@@ -38,26 +38,6 @@
         </configuration>
       </plugin>
       <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>build-helper-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>reserve-network-port</id>
-            <goals>
-              <goal>reserve-network-port</goal>
-            </goals>
-            <configuration>
-              <portNames>
-                <portName>h2.tcp.port</portName>
-              </portNames>
-              <outputFile>
-                ${project.build.directory}/test-classes/projects/good/remote-project/src/test/resources/ports.properties
-              </outputFile>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <version>2.14.1</version>
@@ -69,6 +49,43 @@
       </plugin>
     </plugins>
   </build>
+
+  <profiles>
+    <profile>
+      <id>port-reserve</id>
+      <activation>
+        <property>
+          <name>maven.test.skip</name>
+          <value>false</value>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>build-helper-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>reserve-network-port</id>
+                <goals>
+                  <goal>reserve-network-port</goal>
+                </goals>
+                <phase>process-test-resources</phase>
+                <configuration>
+                  <portNames>
+                    <portName>h2.tcp.port</portName>
+                  </portNames>
+                  <outputFile>
+                    ${project.build.directory}/test-classes/projects/good/remote-project/src/test/resources/ports.properties
+                  </outputFile>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 
   <dependencies>
     <dependency>
