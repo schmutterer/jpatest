@@ -35,7 +35,7 @@ How to use
 With maven add this dependency to your pom.xml:
 <pre>
 &lt;dependency&gt;
-  &lt;groupId&gt;org.openengsb.labs.jpatest&lt;/groupId&gt;
+  &lt;groupId&gt;at.schmutterer.oss.jpatest&lt;/groupId&gt;
   &lt;artifactId&gt;jpa-test-core&lt;/artifactId&gt;
   &lt;scope&gt;test&lt;/scope&gt;
   &lt;version&gt;LATEST&lt;/version&gt;
@@ -57,4 +57,12 @@ public void myTest throws Exception {
 
 By default your persistence-units will connect to an in-memory h2-database, that is cleared automatically after each test.
 There's no need for creating a separate persistence.xml just for tests, because the TestPersistenceUnit will override the necessary properties, so that the h2-database with resource-local transaction is used.
+You can also specify additional configuration overrides by passing them to the TestPersistenceUnit()-constructor.
+If you want to use overrides for all tests you can also specify a properties-file containing the overrides and passing at as System property "jpatest.global.properties" like
+
+<pre>
+    mvn test -Djpatest.global.properties=path/to/my/config.properties
+</pre>
+
+
 Look at the java-doc for possibilities to override additional properties.

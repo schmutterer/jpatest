@@ -36,6 +36,9 @@
  */
 package at.schmutterer.oss.jpatest.junit;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
@@ -45,6 +48,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -152,7 +156,20 @@ public class TestPersistenceUnit implements MethodRule {
     }
 
     private void init(Properties properties) {
-        if (properties.containsKey(JPATEST_SERVER_PORT)) {
+        String globalPropertyFile = System.getProperty("jpatest.global.properties");
+        if (globalPropertyFile != null) {
+            this.propertyOverrides = new Properties();
+            File file = new File(globalPropertyFile);
+            try (FileReader fileReader = new FileReader(file)){
+                this.propertyOverrides.load(fileReader);
+            } catch (IOException e) {
+                throw new AssertionError(e);
+            }
+            this.propertyOverrides.putAll(properties);
+        } else {
+            this.propertyOverrides = properties;
+        }
+        if (this.propertyOverrides.containsKey(JPATEST_SERVER_PORT)) {
             String port = (String) properties.get(JPATEST_SERVER_PORT);
             try {
                 tcpServer = Server.createTcpServer("-tcpPort", port);
@@ -160,7 +177,6 @@ public class TestPersistenceUnit implements MethodRule {
                 throw new AssertionError(e);
             }
         }
-        this.propertyOverrides = properties;
     }
 
     private EntityManager makeEntityManager(EntityManagerFactory emf) {
