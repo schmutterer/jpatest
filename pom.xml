@@ -71,6 +71,7 @@
           <arguments>-Psonatype-oss-release -DpushChanges=false -Dgpg.useagent=true</arguments>
           <preparationGoals>clean install -Dmaven.test.skip=true</preparationGoals>
           <tagNameFormat>v@{project.version}</tagNameFormat>
+          <localCheckout>true</localCheckout>
         </configuration>
         <dependencies>
           <dependency>
