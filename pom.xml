@@ -9,7 +9,7 @@
 
   <groupId>at.schmutterer.oss.jpatest</groupId>
   <artifactId>labs-jpatest-parent</artifactId>
-  <version>2.0.0</version>
+  <version>2.0.1-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>labs-jpatest</name>
@@ -19,7 +19,7 @@
     <connection>scm:git:git://github.com/schmutterer/labs-jpatest.git</connection>
     <developerConnection>scm:git:git@github.com:schmutterer/labs-jpatest.git</developerConnection>
     <url>http://github.com/schmutterer/labs-jpatest</url>
-    <tag>v2.0.0</tag>
+    <tag>HEAD</tag>
   </scm>
 
   <properties>
