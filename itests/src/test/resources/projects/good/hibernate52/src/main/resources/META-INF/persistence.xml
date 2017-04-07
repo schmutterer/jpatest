@@ -41,7 +41,7 @@
 -->
 <persistence version="2.0" xmlns="http://java.sun.com/xml/ns/persistence">
   <persistence-unit name="jpa-unit-test" transaction-type="JTA">
-    <provider>org.hibernate.ejb.HibernatePersistence</provider>
+    <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
     <class>at.schmutterer.oss.jpatest.test.TestModel</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <validation-mode>NONE</validation-mode>

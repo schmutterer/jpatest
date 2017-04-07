@@ -85,6 +85,11 @@ public class UseInMavenProjectsTest {
     }
 
     @Test
+    public void testHibernate5_2() throws Exception {
+        assertThat(new MavenProcessHandler("projects/good/hibernate52/pom.xml").execute(), is(0L));
+    }
+
+    @Test
     public void testEclipselink2_4() throws Exception {
         assertThat(new MavenProcessHandler("projects/good/eclipselink24/pom.xml").execute(), is(0L));
     }

@@ -195,15 +195,6 @@ public class TestPersistenceUnit implements MethodRule {
         persistenceUnitProperties.put("openjpa.Connection2URL", url);
         // Hibernate
         persistenceUnitProperties.put("hibernate.connection.url", url);
-        JdbcDataSource dataSource = new JdbcDataSource();
-        dataSource.setURL(url);
-        String dataSourceUrl = "java:/dummyDataSource_" + s;
-        try {
-            new InitialContext().bind(dataSourceUrl, dataSource);
-        } catch (NamingException e) {
-            throw new AssertionError(e);
-        }
-        persistenceUnitProperties.put("hibernate.connection.datasource", dataSourceUrl);
         persistenceUnitProperties.putAll(propertyOverrides);
         return Persistence.createEntityManagerFactory(s, persistenceUnitProperties);
     }
@@ -233,15 +224,6 @@ public class TestPersistenceUnit implements MethodRule {
 
         @Override
         public void evaluate() throws Throwable {
-            InitialContext initialContext;
-            try {
-                System.setProperty(Context.INITIAL_CONTEXT_FACTORY, "org.apache.naming.java.javaURLContextFactory");
-                System.setProperty(Context.URL_PKG_PREFIXES, "org.apache.naming");
-                initialContext = new InitialContext(new Hashtable<String, Object>());
-                initialContext.createSubcontext("java:");
-            } catch (NamingException e) {
-                throw new RuntimeException(e);
-            }
             try {
                 parent.evaluate();
                 for (EntityManager e : createdEntityManagers) {
@@ -251,8 +233,6 @@ public class TestPersistenceUnit implements MethodRule {
                     }
                 }
             } finally {
-                initialContext.destroySubcontext("java:");
-                initialContext.close();
                 try {
                     for (EntityManager e : createdEntityManagers) {
                         e.close();
