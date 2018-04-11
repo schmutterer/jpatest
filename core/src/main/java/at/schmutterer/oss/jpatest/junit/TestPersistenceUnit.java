@@ -7,15 +7,45 @@
  * Version 2.0 (the "License"); you may not use this file
  * except in compliance with the License. You may obtain a
  * copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  * KIND, either express or implied.  See the License for the
  * specific language governing permissions and limitations
  * under the License.
+ * <p>
+ * Licensed to the Austrian Association for Software Tool Integration (AASTI)
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. The AASTI licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * <p>
+ * Licensed to the Austrian Association for Software Tool Integration (AASTI)
+ * under one or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information regarding copyright
+ * ownership. The AASTI licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 /**
@@ -37,32 +67,28 @@
 package at.schmutterer.oss.jpatest.junit;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Modifier;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
+import javax.persistence.Embeddable;
 import javax.persistence.Entity;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.MappedSuperclass;
 import javax.persistence.Persistence;
 import javax.persistence.PersistenceException;
 import javax.persistence.metamodel.ManagedType;
 
-import org.h2.jdbcx.JdbcDataSource;
 import org.h2.tools.Server;
 import org.junit.rules.MethodRule;
 import org.junit.runners.model.FrameworkMethod;
@@ -75,7 +101,7 @@ public class TestPersistenceUnit implements MethodRule {
     public static final String JPATEST_SERVER_PORT = "h2.tcp.port";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TestPersistenceUnit.class);
-    private static final Properties GLOBAL_DEFAULTS = new Properties(){{
+    private static final Properties GLOBAL_DEFAULTS = new Properties() {{
         put("javax.persistence.transactionType", "RESOURCE_LOCAL");
         // EclipseLink
         put("javax.persistence.jdbc.driver", "org.h2.Driver");
@@ -92,9 +118,9 @@ public class TestPersistenceUnit implements MethodRule {
         put("hibernate.dialect", "org.hibernate.dialect.H2Dialect");
     }};
 
-    private static Map<String, EntityManagerFactory> emCache = new HashMap<String, EntityManagerFactory>();
-    private Set<EntityManagerFactory> usedPersistenceUnits = new HashSet<EntityManagerFactory>();
-    private Set<EntityManager> createdEntityManagers = new HashSet<EntityManager>();
+    private static Map<String, EntityManagerFactory> emCache = new HashMap<>();
+    private Set<EntityManagerFactory> usedPersistenceUnits = new HashSet<>();
+    private Set<EntityManager> createdEntityManagers = new HashSet<>();
     private Server tcpServer;
     private Properties propertyOverrides;
 
@@ -149,7 +175,7 @@ public class TestPersistenceUnit implements MethodRule {
      * override properties for all persistence-units
      * @param propertyMap
      */
-    public TestPersistenceUnit(Map<?,?> propertyMap) {
+    public TestPersistenceUnit(Map<?, ?> propertyMap) {
         Properties properties = new Properties();
         properties.putAll(propertyMap);
         init(properties);
@@ -160,7 +186,7 @@ public class TestPersistenceUnit implements MethodRule {
         if (globalPropertyFile != null) {
             this.propertyOverrides = new Properties();
             File file = new File(globalPropertyFile);
-            try (FileReader fileReader = new FileReader(file)){
+            try (FileReader fileReader = new FileReader(file)) {
                 this.propertyOverrides.load(fileReader);
             } catch (IOException e) {
                 throw new AssertionError(e);
@@ -257,9 +283,13 @@ public class TestPersistenceUnit implements MethodRule {
             int lastsize = javaTypes.size();
             while (!javaTypes.isEmpty()) {
                 Iterator<Class<?>> iterator = javaTypes.iterator();
-                Collection<Exception> exceptionsDuringClean = new ArrayList<Exception>();
+                Collection<Exception> exceptionsDuringClean = new ArrayList<>();
                 while (iterator.hasNext()) {
                     Class<?> javaType = iterator.next();
+                    if (isNonEntityDatabaseClass(javaType)) {
+                        iterator.remove();
+                        continue;
+                    }
                     String name = retrieveEntityName(javaType);
                     if (name == null) {
                         LOGGER.warn("could not determine name for entity {}", javaType);
@@ -273,8 +303,8 @@ public class TestPersistenceUnit implements MethodRule {
                         iterator.remove();
                     } catch (Exception e) {
                         if (e instanceof PersistenceException
-                                || e.getClass().getName().equals("org.eclipse.persistence.exceptions.DatabaseException") // for eclipse-link < 2.5.0
-                                ) {
+                            || e.getClass().getName().equals("org.eclipse.persistence.exceptions.DatabaseException") // for eclipse-link < 2.5.0
+                            ) {
                             exceptionsDuringClean.add(e);
                             LOGGER.debug("error during delete, could be normal", e);
                             entityManager.getTransaction().rollback();
@@ -284,7 +314,6 @@ public class TestPersistenceUnit implements MethodRule {
                 if (javaTypes.size() == lastsize) {
                     entityManager.getTransaction().begin();
                     entityManager.createNativeQuery("SHUTDOWN").executeUpdate();
-
                     try {
                         entityManager.getTransaction().commit();
                     } catch (Exception e) {
@@ -297,7 +326,20 @@ public class TestPersistenceUnit implements MethodRule {
                 lastsize = javaTypes.size();
             }
             entityManager.close();
-            LOGGER.info("cleared database in {}ms", System.currentTimeMillis() - start);
+            LOGGER.info("cleared database in {} ms", System.currentTimeMillis() - start);
+        }
+
+        private boolean isNonEntityDatabaseClass(Class<?> clazz) {
+            if (Modifier.isAbstract(clazz.getModifiers())) {
+                return true;
+            }
+            if (clazz.getAnnotation(Embeddable.class) != null) {
+                return true;
+            }
+            if (clazz.getAnnotation(MappedSuperclass.class) != null) {
+                return true;
+            }
+            return false;
         }
 
         private String retrieveEntityName(Class<?> javaType) {
